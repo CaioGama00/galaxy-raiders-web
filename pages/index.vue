@@ -33,15 +33,32 @@
     <div id="deep-space" />
     <h1 class="game-over-text">Game Over</h1>
   </div>
+  <div id="leaderboard-modal" v-if="showLeaderboardModal">
+      <div class="modal-content">
+        <h2 class="modal-heading">Leaderboard</h2>
+        <ul>
+          <li v-for="(entry, index) in leaderboard" :key="index">
+            <p>Date: {{ entry.datetime }}</p>
+            <p>Asteroids Destroyed: {{ entry.asteroidsDestroyed }}</p>
+            <p>Points: {{ entry.points }}</p>
+          </li>
+        </ul>
+        <button @click="closeLeaderboard">Close</button>
+      </div>
+    </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import leaderboardData from './Leaderboard.json';
 
 const menuVisible = ref(true);
 const gameStarted = ref(false);
 const gamePaused = ref(false);
 const gameOver = ref(false);
+const leaderboard = ref([]);
+const showLeaderboardModal = ref(false);
+
 
 const startGame = () => {
   menuVisible.value = false;
@@ -55,7 +72,12 @@ const resumeGame = () => {
 };
 
 const showLeaderboard = () => {
-  // Code to show the leaderboard
+  leaderboard.value = leaderboardData;
+  showLeaderboardModal.value = true; // Show the leaderboard modal when the button is clicked
+};
+
+const closeLeaderboard = () => {
+  showLeaderboardModal.value = false; // Hide the leaderboard modal when the "Close" button is clicked
 };
 
 const quitGame = () => {
@@ -82,7 +104,6 @@ onMounted(() => {
 
     const command = keyToCommand[event.code];
 
-    // Ignore if invalid key was pressed
     if (command === undefined) return;
 
     console.log(`Triggering command: ${command}`);
@@ -98,7 +119,7 @@ onMounted(() => {
     if (!menuVisible.value && !gamePaused.value) {
       updateSpaceField();
     }
-  }, 50);
+  }, 60);
 });
 </script>
 
@@ -191,6 +212,32 @@ onMounted(() => {
       transform: translate(1px);
     }
   }
+
+#leaderboard-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.modal-content {
+  background-color: #36bbf5; /* Match the color with the other menu buttons */
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center; /* Center the content */
+  color: #fff; /* Text color */
+}
+
+.modal-heading {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
 
 #deep-space {
   height: calc(100% - 4rem);
